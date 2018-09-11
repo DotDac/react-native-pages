@@ -71,6 +71,7 @@ export default class Pages extends PureComponent {
 
     let { startPage, progress = new Animated.Value(startPage) } = this.props;
 
+    this.oldProgress = startPage;
     this.progress = startPage;
     this.mounted = false;
     this.scrollState = -1;
@@ -147,6 +148,7 @@ export default class Pages extends PureComponent {
 
   onScrollBeginDrag() {
     this.scrollState = 0;
+    this.oldProgress = this.progress;
   }
 
   onScrollEndDrag() {
@@ -154,7 +156,11 @@ export default class Pages extends PureComponent {
 
     /* Vertical pagination is not working on android, scroll by hands */
     if ('android' === Platform.OS && !horizontal) {
-      this.scrollToPage(Math.round(this.progress));
+      if(this.oldProgress > this.progress) {
+        this.scrollToPage(this.oldProgress - 1);
+      } else if(this.oldProgress < this.progress) {
+        this.scrollToPage(this.oldProgress + 1);
+      }
     }
 
     this.scrollState = 1;
